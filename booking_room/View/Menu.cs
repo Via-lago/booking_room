@@ -215,7 +215,7 @@ namespace booking_room.View
                     }
                     break;
 
-                case 3:
+                case 3: 
                     var i = new InsertData();
                     i.Inputan();
                 break;
