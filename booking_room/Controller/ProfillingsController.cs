@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace booking_room.Controller
 {
-    public class ProfillingsCont
+    public class ProfillingsController
     {
         public List<Profilings> GetProfilings()
         {

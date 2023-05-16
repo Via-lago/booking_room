@@ -12,9 +12,9 @@ namespace booking_room.View
         public void PrintOutData()
         {
             var DataEmployee = new DataEmployee();
-            var ProfillingCont = new ProfillingsCont();
-            var crudedu = new CrudEdu();
-            var crud = new CRUD();
+            var ProfillingCont = new ProfillingsController();
+            var crudedu = new EducationController();
+            var crud = new UniversityController();
             var getEmployee1 = DataEmployee.GetEmployee();
             var getProfilings = ProfillingCont.GetProfilings();
             var educations1 = crudedu.GetEducation();

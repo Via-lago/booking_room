@@ -10,7 +10,7 @@ using booking_room.Context;
 
 namespace booking_room.Controller
 {
-    public class CrudEdu
+    public class EducationController
     {
 
         // GET : Universities
