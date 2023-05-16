@@ -7,266 +7,119 @@ using System.Text;
 using System.Threading.Tasks;
 using booking_room.Model;
 using booking_room.Context;
+using booking_room.View;
 
 namespace booking_room.Controller
 {
     public class EducationController
     {
-
-        // GET : Universities
-        public List<Education> GetEducation()
+        public static void Get()
         {
-            var Education = new List<Education>();
-            using var connection = MyConnection.Get();
-            try
+            var e = new Education();
+            var result = e.GetEducation();
+            var view = new EducationView();
+            if (result.Count == 0)
             {
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "SELECT * FROM tb_m_educations";
-
-                connection.Open();
-
-                using SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        var education = new Education();
-                        education.Id = reader.GetInt32(0);
-                        education.Major = reader.GetString(1);
-                        education.Degree = reader.GetString(2);
-                        education.GPA = reader.GetString(3);
-
-                        Education.Add(education);
-                    }
-
-                    return Education;
-                }
-
+                view.Output("Data tidak ditemukan");
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return new List<Education>();
-        }
-
-        // INSERT : Universities
-
-        public int InsertEducations(Education education)
-        {
-            int result = 0;
-            using var connection = MyConnection.Get();
-            connection.Open();
-
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
-            {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "INSERT INTO tb_m_educations(major,degree,gpa,university_id) VALUES (@major,@degree,@gpa,@university_id)";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pMajor = new SqlParameter();
-                pMajor.ParameterName = "@major";
-                pMajor.SqlDbType = SqlDbType.VarChar;
-                pMajor.Size = 50;
-                pMajor.Value = education.Major;
-
-                var pDegree = new SqlParameter();
-                pDegree.ParameterName = "@degree";
-                pDegree.SqlDbType = SqlDbType.VarChar;
-                pDegree.Size = 50;
-                pDegree.Value = education.Degree;
-
-                var pGPA = new SqlParameter();
-                pGPA.ParameterName = "@gpa";
-                pGPA.SqlDbType = SqlDbType.VarChar;
-                pGPA.Size = 50;
-                pGPA.Value = education.GPA;
-
-                var pUnivId = new SqlParameter();
-                pUnivId.ParameterName = "@university_id";
-                pUnivId.SqlDbType = SqlDbType.VarChar;
-                pUnivId.Size = 50;
-                pUnivId.Value = education.UniversityId;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pMajor);
-                command.Parameters.Add(pDegree);
-                command.Parameters.Add(pGPA);
-                command.Parameters.Add(pUnivId);
-
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return result;
-        }
-        // GET : Universities(5)
-
-        public void GetEducationsById(Education education)
-        {
-
-            using var connection = MyConnection.Get();
-
-            try
-            {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "Select * from tb_m_educations where id=@id";
-
-
-                // Membuat parameter
-                var pId = new SqlParameter();
-                pId.ParameterName = "@id";
-                pId.SqlDbType = SqlDbType.Int;
-                pId.Value = education.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pId);
-                connection.Open();
-
-                // Menjalankan command
-                /* result = command.ExecuteNonQuery();*/
-
-                using SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        Console.WriteLine("Id = " + reader.GetInt32(0));
-                        Console.WriteLine("Major = " + reader.GetString(1));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
+                view.Output(result);
             }
         }
 
-        // UPDATE : Universities(obj)
-
-        public  int UpdateEducations(Education education)
+        public static void Insert()
         {
-            int result = 0;
-            using var connection = MyConnection.Get();
-            connection.Open();
-
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
+            var education = new Education();
+            var edu = new Education();
+            Console.Write("Major: ");
+            education.Major = Console.ReadLine();
+            Console.Write("Degree: ");
+            education.Degree = Console.ReadLine();
+            Console.Write("GPA: ");
+            education.GPA = Console.ReadLine();
+            Console.Write("University ID: ");
+            education.UniversityId = Convert.ToInt32(Console.ReadLine());
+            
+            var result = edu.InsertEducations(education);
+            var view = new EducationView();
+            if (result > 0)
             {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "update tb_m_educations set major=@major where id =@id  ";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pUpdate = new SqlParameter();
-                pUpdate.ParameterName = "@major";
-                pUpdate.SqlDbType = SqlDbType.VarChar;
-                pUpdate.Size = 50;
-                pUpdate.Value = education.Major;
-
-                var pUpdate2 = new SqlParameter();
-                pUpdate2.ParameterName = "@id";
-                pUpdate2.SqlDbType = SqlDbType.VarChar;
-                pUpdate2.Size = 50;
-                pUpdate2.Value = education.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pUpdate);
-                command.Parameters.Add(pUpdate2);
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
-
+                view.Output("Insert success.");
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
-
+                view.Output("Insert Failed");
             }
-            finally
-            {
-                connection.Close();
-            }
-
-            return result;
         }
-        // DELETE : Universities(5)
 
-        public int DeleteEducationById(Education education)
+        public static void Update()
         {
-            int result = 0;
-            using var connection = MyConnection.Get();
-
-            connection.Open();
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
+            string input = Console.ReadLine();
+            List<string> eColumnsToUpdate = new List<string>();
+            if (input.Contains("1"))
             {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "DELETE FROM tb_m_educations WHERE id=@id";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pId = new SqlParameter();
-                pId.ParameterName = "@id";
-                pId.SqlDbType = SqlDbType.Int;
-                pId.Value = education.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pId);
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
+                eColumnsToUpdate.Add("major");
             }
-            catch (Exception e)
+            if (input.Contains("2"))
             {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
+                eColumnsToUpdate.Add("degree");
             }
-            finally
+            if (input.Contains("3"))
             {
-                connection.Close();
+                eColumnsToUpdate.Add("gpa");
             }
-            return result;
+            if (input.Contains("4"))
+            {
+                eColumnsToUpdate.Add("university_id");
+            }
+
+            Dictionary<string, object> eUpdateColumns = new Dictionary<string, object>();
+            foreach (string column in eColumnsToUpdate)
+            {
+                Console.Write($"Enter new {column}: ");
+                string newValue = Console.ReadLine();
+                eUpdateColumns.Add(column, newValue);
+            }
+
+            Console.Write("Insert column name as primary key: ");
+            string ePrimaryKeyName = Console.ReadLine();
+
+            Console.Write("Insert value of primary key: ");
+            object ePrimaryKeyValue = Console.ReadLine();
+            var education = new Education();
+            var edu = new Education();
+            var result = edu.UpdateEducations(education);
+            var view = new EducationView();
+            if (result > 0)
+            {
+                view.Output("Update Success.");
+            }
+            else
+            {
+                view.Output("Update Success");
+            }
         }
+
+        public static void Delete()
+        {
+            var education = new Education();
+            Console.Write("Insert number of row: ");
+            education.Id = Convert.ToInt32(Console.ReadLine());
+            var edu =new Education();
+            var result = edu.DeleteEducationById(education);
+            var view = new EducationView();
+            if (result > 0)
+            {
+                view.Output("Delete success.");
+            }
+            else
+            {
+                view.Output("Delete Failed");
+            }
+
+
+        }
+
     }
 }

@@ -7,245 +7,103 @@ using System.Text;
 using System.Threading.Tasks;
 using booking_room.Context;
 using booking_room.Model;
+using booking_room.View;
 
 namespace booking_room.Controller
 {
-    public class CRUD
+    public class UniversityController
 
     {
-
-        // GET : Universities 
-        public List<Universities> GetUniversities()
+        public static void Get()
         {
-            using var connection = MyConnection.Get();
-            var universities = new List<Universities>();
-
-            try
+            var u = new Universities(); 
+            var results = u.GetUniversities();
+            var view = new UniversityView();
+            if (results.Count == 0)
             {
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "SELECT * FROM tb_m_universities";
-
-                connection.Open();
-
-                using SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        var university = new Universities();
-                        university.Id = reader.GetInt32(0);
-                        university.Name = reader.GetString(1);
-
-                        universities.Add(university);
-                    }
-
-                    return universities;
-                }
-
+                view.Output("Data tidak ditemukan");
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
+                view.Output(results);
             }
-            finally
-            {
-                connection.Close();
-            }
-            return new List<Universities>();
+
         }
 
-        // INSERT : Universities
-
-        public int InsertUniversity(Universities university)
+        public static void Insert()
         {
-            int result = 0;
-            using var connection = MyConnection.Get();
-            connection.Open();
+            var u = new Universities();
+            Console.Write("Name : ");
+            u.Name = Console.ReadLine();
+            var Un = new Universities();
 
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
+            var result = Un.InsertUniversity(u);
+            var view = new UniversityView();
+            if (result > 0)
             {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "INSERT INTO tb_m_universities(nama) VALUES (@name)";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pName = new SqlParameter();
-                pName.ParameterName = "@name";
-                pName.SqlDbType = SqlDbType.VarChar;
-                pName.Size = 50;
-                pName.Value = university.Name;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pName);
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
-
+                view.Output("Insert success.");
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
-            }
-            finally
-            {
-                connection.Close();
+                view.Output("Insert failed");
             }
 
-            return result;
-        }
-        // GET : Universities(5)
-
-        public void GetUniversityById(Universities university)
-        {
-            int result = 0;
-            using var connection = MyConnection.Get();
-
-            try
-            {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "Select * from tb_m_universities where id=@id";
-
-
-                // Membuat parameter
-                var pId = new SqlParameter();
-                pId.ParameterName = "@id";
-                pId.SqlDbType = SqlDbType.Int;
-                pId.Value = university.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pId);
-                connection.Open();
-
-                // Menjalankan command
-                /* result = command.ExecuteNonQuery();*/
-
-                using SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        Console.WriteLine("Id = " + reader.GetInt32(0));
-                        Console.WriteLine("Nama = " + reader.GetString(1));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
         }
 
-        // UPDATE : Universities(obj)
-
-        public int UpdateUniversity(Universities university)
+        public static void Update()
         {
-            int result = 0;
-            using var connection = MyConnection.Get();
-            connection.Open();
+            List<string> columnsToUpdate = new List<string>();
+            columnsToUpdate.Add("name");
 
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
+            Dictionary<string, object> updateColumns = new Dictionary<string, object>();
+            foreach (string column in columnsToUpdate)
             {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "update tb_m_universities set nama=@name where id =@id  ";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pUpdate = new SqlParameter();
-                pUpdate.ParameterName = "@name";
-                pUpdate.SqlDbType = SqlDbType.VarChar;
-                pUpdate.Size = 50;
-                pUpdate.Value = university.Name;
-
-                var pUpdate2 = new SqlParameter();
-                pUpdate2.ParameterName = "@id";
-                pUpdate2.SqlDbType = SqlDbType.VarChar;
-                pUpdate2.Size = 50;
-                pUpdate2.Value = university.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pUpdate);
-                command.Parameters.Add(pUpdate2);
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
-
-            }
-            finally
-            {
-                connection.Close();
+                Console.Write($"Enter new {column}: ");
+                string newValue = Console.ReadLine();
+                updateColumns.Add(column, newValue);
             }
 
-            return result;
+            Console.Write("Insert column name as primary key: ");
+            string primaryKeyName = Console.ReadLine();
+
+            Console.Write("Insert value of primary key: ");
+            object primaryKeyValue = Console.ReadLine();
+
+            var u = new Universities();
+            var university = new Universities();
+            var result = u.UpdateUniversity(university);
+
+            var view = new UniversityView();
+            if (result > 0)
+            {
+                view.Output("Update Success.");
+            }
+            else
+            {
+                view.Output("Update Success");
+            }
+
         }
-        // DELETE : Universities(5)
 
-        public int DeleteUniversityById(Universities university)
+        public static void Delete()
         {
-            int result = 0;
-            using var connection = MyConnection.Get();
-
-            connection.Open();
-            SqlTransaction transaction = connection.BeginTransaction();
-            try
+            var university = new Universities();
+            Console.Write("Insert number of row: ");
+            university.Id = Convert.ToInt32(Console.ReadLine());
+            var u = new Universities();
+            var result = u.DeleteUniversityById(university);
+            var view = new UniversityView();
+            if (result > 0)
             {
-                // Command melakukan insert
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandText = "DELETE FROM tb_m_universities WHERE id=@id";
-                command.Transaction = transaction;
-
-                // Membuat parameter
-                var pId = new SqlParameter();
-                pId.ParameterName = "@id";
-                pId.SqlDbType = SqlDbType.Int;
-                pId.Value = university.Id;
-
-                // Menambahkan parameter ke command
-                command.Parameters.Add(pId);
-
-                // Menjalankan command
-                result = command.ExecuteNonQuery();
-                transaction.Commit();
-
-                return result;
+                view.Output("Delete success.");
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.Message);
-                transaction.Rollback();
+                view.Output("Delete Failed");
             }
-            finally
-            {
-                connection.Close();
-            }
-            return result;
+
         }
+
 
     }
 }
