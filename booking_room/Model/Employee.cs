@@ -1,10 +1,13 @@
-﻿using System;
+﻿using booking_room.Context;
+using booking_room.Controller;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace booking_room
+namespace booking_room.Model
 {
     public class Employee
     {
@@ -17,7 +20,7 @@ namespace booking_room
         public DateTime HiringDate { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public int DepartmentId { get; set; }
+        public string DepartmentId { get; set; }
 
     }
 }

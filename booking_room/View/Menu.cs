@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using booking_room.Controller;
 
-namespace booking_room
+namespace booking_room.View
 {
-   public class Menu
+    public class Menu
     {
 
         public static void daftarmenu()
         {
-            var university = new Universities();
-            var educations = new Education();
+            var university = new Model.Universities();
+            var educations = new Model.Education();
             int pilih;
             int input;
             int pilihan;
@@ -34,13 +36,20 @@ namespace booking_room
             Console.WriteLine("1.Data University ");
             Console.WriteLine("2.Data Education");
             Console.WriteLine("3.Insert Data");
-            Console.WriteLine("4. Exit");
+            Console.WriteLine("4.Data Employee");
+            Console.WriteLine("5.Data Profilings");
+            Console.WriteLine("6.Semua Data");
+            Console.WriteLine("7. Exit");
             Console.WriteLine("================");
 
             Console.WriteLine("Pilihan: ");
             pilih = Convert.ToInt16(Console.ReadLine());
-
-            if(pilih == 1 || pilih == 2)
+            
+            // Variable baru untuk class
+            var c = new CRUD();
+            var ce = new CrudEdu();
+            
+            if (pilih == 1 || pilih == 2)
             {
                 Console.WriteLine("================ Pilih Aksi Yang Akan Dilakukan ================");
                 Console.WriteLine("1.Tampilkan Semua Data");
@@ -50,19 +59,18 @@ namespace booking_room
                 Console.WriteLine("5.Delete Data");
                 Console.WriteLine("================");
             }
-            
 
-
-            switch (pilih)
+               switch (pilih)
             {
                 case 1:
                     Console.WriteLine("Pilih aksi: ");
                     pilihan = Convert.ToInt16(Console.ReadLine());
                     Console.WriteLine("================");
-                    
+
                     if (pilihan == 1)
                     {
-                        var results = CRUD.GetUniversities();
+                        
+                        var results = c.GetUniversities();
                         Console.WriteLine("Data University (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         foreach (var result in results)
@@ -79,17 +87,17 @@ namespace booking_room
                         Console.WriteLine("UniversitiesByID (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         university.Id = idUniv;
-                        CRUD.GetUniversityById(university);
+                        c.GetUniversityById(university);
                     }
-                    if(pilihan == 3)
+                    if (pilihan == 3)
                     {
                         Console.WriteLine("Masukan Nama : ");
-                        namauniv=Console.ReadLine();
+                        namauniv = Console.ReadLine();
                         Console.WriteLine("====================");
                         Console.WriteLine("Insert Data Education (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         university.Name = namauniv;
-                        var result = CRUD.InsertUniversity(university);
+                        var result = c.InsertUniversity(university);
                         Console.WriteLine("====================");
                         if (result > 0)
                         {
@@ -102,54 +110,42 @@ namespace booking_room
                     }
                     if (pilihan == 4)
                     {
+                        
                         Console.WriteLine("Masukan Id : ");
-                        updateid= Convert.ToInt16(Console.ReadLine());
+                        updateid = Convert.ToInt16(Console.ReadLine());
                         Console.WriteLine("Masukan Nama : ");
-                        updatename= Console.ReadLine();
+                        updatename = Console.ReadLine();
                         Console.WriteLine("====================");
                         Console.WriteLine("UpdateData (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         university.Id = updateid;
                         university.Name = updatename;
-                        var result = CRUD.UpdateUniversity(university);
-                        if (result > 0)
-                        {
-                            Console.WriteLine("Update success.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Update failed.");
-                        }
+                        var result = c.UpdateUniversity(university);
+                     
                     }
-                    else if (pilihan == 5) 
+                    else if (pilihan == 5)
                     {
+                        
                         Console.WriteLine("Masukan Id : ");
                         delIdUniv = Convert.ToInt16(Console.ReadLine());
                         Console.WriteLine("====================");
                         Console.WriteLine("DeleteByID (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         university.Id = delIdUniv;
-                        var result = CRUD.DeleteUniversityById(university);
-                        if (result > 0)
-                        {
-                            Console.WriteLine("Delete success.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Delete failed.");
-                        }
+                        var result = c.DeleteUniversityById(university);
+                        
                     }
-                    
-                break;
+
+                    break;
 
                 case 2:
                     Console.WriteLine("Pilih aksi: ");
                     pilihan = Convert.ToInt16(Console.ReadLine());
                     Console.WriteLine("================");
-                    
+
                     if (pilihan == 1)
                     {
-                        var results = CrudEdu.GetEducation();
+                        var results = ce.GetEducation();
                         Console.WriteLine("Data Education (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         foreach (var result in results)
@@ -161,15 +157,15 @@ namespace booking_room
                         }
                     }
 
-                    if(pilihan == 2)
+                    if (pilihan == 2)
                     {
                         Console.WriteLine("Masukan Id : ");
                         Console.WriteLine("====================");
                         idEduc = Convert.ToInt16(Console.ReadLine());
                         Console.WriteLine("EducationsByID (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
-                        educations.Id =idEduc;
-                        CrudEdu.GetEducationsById(educations);
+                        educations.Id = idEduc;
+                        ce.GetEducationsById(educations);
                     }
                     if (pilihan == 3)
                     {
@@ -187,15 +183,9 @@ namespace booking_room
                         educations.Degree = degree;
                         educations.GPA = gpa;
                         educations.UniversityId = univ;
-                        var result = CrudEdu.InsertEducations(educations);
-                        if (result > 0)
-                        {
-                            Console.WriteLine("Insert success.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Insert failed.");
-                        }
+                        var result = ce.InsertEducations(educations);
+                        Console.WriteLine("Insert success.");
+                        
                     }
                     if (pilihan == 4)
                     {
@@ -208,17 +198,11 @@ namespace booking_room
                         Console.WriteLine("====================");
                         educations.Id = idEdu;
                         educations.Major = nameEdu;
-                        var result = CrudEdu.UpdateEducations(educations);
-                        if (result > 0)
-                        {
-                            Console.WriteLine("Update success.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Update failed.");
-                        }
+                        var result = ce.UpdateEducations(educations);
+                        Console.WriteLine("Update success.");
+                        
                     }
-                    else if (pilihan == 5) 
+                    else if (pilihan == 5)
                     {
                         Console.WriteLine("Masukan Id : ");
                         delIdEdu = Convert.ToInt16(Console.ReadLine());
@@ -226,28 +210,60 @@ namespace booking_room
                         Console.WriteLine("DeleteByID (OKTAVIA DEYO LAGO)");
                         Console.WriteLine("====================");
                         educations.Id = delIdEdu;
-                        var result = CrudEdu.DeleteEducationById(educations);
-                        if (result > 0)
-                        {
-                            Console.WriteLine("Delete success.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Delete failed.");
-                        }
+                        var result = ce.DeleteEducationById(educations);
+                        Console.WriteLine("Delete success.");
                     }
                     break;
 
                 case 3:
-
-                    
-                    InsertData.Inputan();
-
+                    var i = new InsertData();
+                    i.Inputan();
                 break;
 
-            }
-          
-            }
+                case 4:
+                    var em = new DataEmployee();
+                    var results1 = em.GetEmployee();
+                    Console.WriteLine("Data Employee (OKTAVIA DEYO LAGO)");
+                    Console.WriteLine("====================");
+                    foreach (var result1 in results1)
+                    {
+                        Console.WriteLine("Id: " + result1.Id);
+                        Console.WriteLine("NIK: " + result1.NIK);
+                        Console.WriteLine("First Name: " + result1.FirstName);
+                        Console.WriteLine("Last Name: " + result1.LastName);
+                        Console.WriteLine("Birthdate : " + result1.Birthdate);
+                        Console.WriteLine("Gender : " + result1.Gender);
+                        Console.WriteLine("HiringDate : " + result1.HiringDate);
+                        Console.WriteLine("Email : " + result1.Email);
+                        Console.WriteLine("PhoneNumber : " + result1.PhoneNumber);
+                        Console.WriteLine("DepartmenId : " + result1.DepartmentId);
+                    }
+                    /*Console.WriteLine("=================================");
+                    var getEmployee = from e in Employee.GetEmployee()
+                                      where e.Gender == "Male"
+                                      select e; 
+                    foreach(var Item in getEmployee)
+                    {
+                        Console.WriteLine(Item.Gender);
+                    }*/
+                    break;
 
+                case 5:
+                    var p =new ProfillingsCont();  
+                    var results2 = p.GetProfilings();
+                    foreach (var result2 in results2)
+                    {
+                        Console.WriteLine("Employee id : " + result2.EmployeeId);
+                        Console.WriteLine("Education id : " + result2.EducationId);
+                    }
+                    break;
+
+                case 6:
+                    var t =new TampilanLINQ(); 
+                    t.PrintOutData();
+                    break;
+
+            }
         }
     }
+}

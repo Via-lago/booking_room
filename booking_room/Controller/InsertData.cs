@@ -5,19 +5,17 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using booking_room.Model;
+using booking_room.Context;
 
-namespace booking_room
-{
+namespace booking_room.Controller
+{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
     public class InsertData
     {
-        private static readonly string connectionString =
-
-       "Data Source=LAPTOP-N3R9H5VB\\MSSQLSERVER02;database= db_booking_room;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
-        
-        public static int InsertEmployee(Employee employee)
+        public int InsertEmployee(Employee employee)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -100,9 +98,9 @@ namespace booking_room
 
                 return result;
 
-                }
-                catch (Exception e)
-                {
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e.Message);
                 transaction.Rollback();
             }
@@ -114,10 +112,10 @@ namespace booking_room
             return result;
         }
 
-        public static int InsertEducations(Education education)
+        public int InsertEducations(Education education)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -149,18 +147,10 @@ namespace booking_room
                 pGPA.Size = 50;
                 pGPA.Value = education.GPA;
 
-                /*var pUnivId = new SqlParameter();
-                pUnivId.ParameterName = "@university_id";
-                pUnivId.SqlDbType = SqlDbType.VarChar;
-                pUnivId.Size = 50;
-                pUnivId.Value = education.UniversityId;*/
-
                 // Menambahkan parameter ke command
                 command.Parameters.Add(pMajor);
                 command.Parameters.Add(pDegree);
                 command.Parameters.Add(pGPA);
-                /*command.Parameters.Add(pUnivId);*/
-
 
                 // Menjalankan command
                 result = command.ExecuteNonQuery();
@@ -182,11 +172,10 @@ namespace booking_room
             return result;
         }
 
-        public static int GetEducationsById(Education education)
+        public int GetEducationsById(Education education)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
-
+            using var connection = MyConnection.Get();
 
             try
             {
@@ -195,16 +184,13 @@ namespace booking_room
                 command.Connection = connection;
                 command.CommandText = "select top 1 id from tb_m_educations order by id desc;";
 
-
-
                 // Menambahkan parameter ke command
-                
+
                 connection.Open();
 
                 // Menjalankan command
                 int LastInsertId = Convert.ToInt32(command.ExecuteScalar());
 
-                /*using SqlDataReader reader = command.ExecuteReader();*/
                 return LastInsertId;
             }
             catch (Exception e)
@@ -218,10 +204,10 @@ namespace booking_room
             return result;
         }
 
-        public static int InsertUniversity(Universities university)
+        public int InsertUniversity(Universities university)
         {
             int result1 = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -262,33 +248,36 @@ namespace booking_room
             return result1;
         }
 
-        public static string GetProfilingsById(String NIK)
+        public string GetProfilingsById(string NIK)
         {
-            string result= "";
-            using var connection = new SqlConnection(connectionString);
-
+            var result = "";
+            using var connection = MyConnection.Get();
 
             try
             {
                 // Command melakukan insert
                 SqlCommand command = new SqlCommand();
                 command.Connection = connection;
-                command.CommandText = "select id from tb_m_employee where nik = @nik;";
+                command.CommandText = "select * from tb_m_employee where nik = @nik;";
 
                 // Menambahkan parameter ke command
 
                 connection.Open();
                 var pNIK = new SqlParameter();
                 pNIK.ParameterName = "@nik";
-                pNIK.SqlDbType = SqlDbType.VarChar;
-                pNIK.Size = 50;
+                pNIK.SqlDbType = SqlDbType.Char;
+                pNIK.Size = 6;
                 pNIK.Value = NIK;
                 command.Parameters.Add(pNIK);
 
-                // Menjalankan command
-                String LastInsertId = Convert.ToString(command.ExecuteReader());
+                command.ExecuteNonQuery();
 
-                return LastInsertId;
+                using SqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    return reader[0].ToString();
+                }
             }
             catch (Exception e)
             {
@@ -300,10 +289,10 @@ namespace booking_room
             }
             return result;
         }
-        public static int InsertProfilling(Profilings profilings)
+        public int InsertProfilling(Profilings profilings)
         {
             int result1 = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -312,7 +301,8 @@ namespace booking_room
                 // Command melakukan insert
                 SqlCommand command = new SqlCommand();
                 command.Connection = connection;
-                command.CommandText = "INSERT INTO tb_tr_profilings values (@employee_id,@education_id)";
+                command.CommandText = "INSERT INTO tb_tr_profilings values " +
+                    "(@employee_id,@education_id)";
                 command.Transaction = transaction;
 
                 // Membuat parameter
@@ -350,11 +340,11 @@ namespace booking_room
             return result1;
         }
 
-        public static void Inputan() 
+        public void Inputan()
         {
             var educations = new Education();
             var employee = new Employee();
-            var university= new Universities();
+            var university = new Universities();
             var profiling = new Profilings();
             string nik;
             string firstName;
@@ -364,7 +354,7 @@ namespace booking_room
             string phone;
             string major;
             string degree;
-            int departmentId;
+            string departmentId;
             string gpa;
             string univ;
             int EduId;
@@ -373,7 +363,7 @@ namespace booking_room
 
             Console.WriteLine("==========Insert Data==========");
             Console.WriteLine("====================");
-     /*       Console.WriteLine("NIK : ");
+            Console.WriteLine("NIK : ");
             nik = Console.ReadLine();
             Console.WriteLine("First Name : ");
             firstName = Console.ReadLine();
@@ -390,7 +380,7 @@ namespace booking_room
             Console.WriteLine("Phone Number : ");
             phone = Console.ReadLine();
             Console.WriteLine("Department ID :");
-            departmentId = Convert.ToInt16(Console.ReadLine()); ;
+            departmentId = Console.ReadLine();
             Console.WriteLine("Major : ");
             major = Console.ReadLine();
             Console.WriteLine("Degree : ");
@@ -398,22 +388,7 @@ namespace booking_room
             Console.WriteLine("GPA : ");
             gpa = Console.ReadLine();
             Console.WriteLine("University Name : ");
-            univ = Console.ReadLine();*/
-
-            nik = "981832";
-            firstName = "Harr";
-            lastName = "Tan";
-            DateTime Birth = new DateTime(1987, 02, 05);
-            gender = "Female";
-            DateTime hiring = new DateTime(2021,04,05);
-            email = "HRTN";
-            phone = "90899.998128.16783";
-            departmentId = 30;
-            major = "Sistem Informasi";
-            degree = "S1";
-            gpa = "3.40";
-            univ = "Universitas Bogor";
-
+            univ = Console.ReadLine();
             Console.WriteLine("Insert Data Educations(OKTAVIA DEYO LAGO)");
             Console.WriteLine("====================");
             employee.NIK = nik;
@@ -422,27 +397,28 @@ namespace booking_room
             employee.Birthdate = Birth;
             employee.Gender = gender;
             employee.HiringDate = hiring;
-            employee.Email  = email;
+            employee.Email = email;
             employee.PhoneNumber = phone;
             employee.DepartmentId = departmentId;
             university.Name = univ;
             educations.Major = major;
             educations.Degree = degree;
             educations.GPA = gpa;
-
-            profiling.EducationId = 0;
-            profiling.EmployeeId ="";
+            employee.Id = "";
 
             try
             {
-                var result = InsertData.InsertEmployee(employee);
-                var result1 = InsertData.InsertUniversity(university);
-                var result2 = InsertData.InsertEducations(educations);
-                var result3 = InsertData.GetProfilingsById(employee.NIK);
+                
+                var result = InsertEmployee(employee);
+                var result1 = InsertUniversity(university);
+                var result2 = InsertEducations(educations);
+                var result3 = GetProfilingsById(employee.NIK);
                 Console.WriteLine(result3);
-                var result4 = InsertData.GetEducationsById(educations);
+                var result4 = GetEducationsById(educations);
                 Console.WriteLine(result4);
-                var result5 = InsertData.InsertProfilling(profiling);
+                profiling.EducationId = result4;
+                profiling.EmployeeId = result3;
+                var result5 = InsertProfilling(profiling);
             }
             catch (Exception ex)
             {

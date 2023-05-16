@@ -5,21 +5,21 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using booking_room.Context;
+using booking_room.Model;
 
-namespace booking_room
+namespace booking_room.Controller
 {
-   public class CRUD
+    public class CRUD
 
     {
-        private static readonly string connectionString =
 
-        "Data Source=LAPTOP-N3R9H5VB\\MSSQLSERVER02;database= db_booking_room;Integrated Security=True;Connect Timeout=30;Encrypt=False;";
-
-        // GET : Universities
-        public static List<Universities> GetUniversities()
+        // GET : Universities 
+        public List<Universities> GetUniversities()
         {
+            using var connection = MyConnection.Get();
             var universities = new List<Universities>();
-            using SqlConnection connection = new SqlConnection(connectionString);
+
             try
             {
                 SqlCommand command = new SqlCommand();
@@ -57,10 +57,10 @@ namespace booking_room
 
         // INSERT : Universities
 
-        public static int InsertUniversity(Universities university)
+        public int InsertUniversity(Universities university)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -103,11 +103,10 @@ namespace booking_room
         }
         // GET : Universities(5)
 
-        public static void GetUniversityById(Universities university)
+        public void GetUniversityById(Universities university)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
-
+            using var connection = MyConnection.Get();
 
             try
             {
@@ -152,10 +151,10 @@ namespace booking_room
 
         // UPDATE : Universities(obj)
 
-        public static int UpdateUniversity(Universities university)
+        public int UpdateUniversity(Universities university)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
             connection.Open();
 
             SqlTransaction transaction = connection.BeginTransaction();
@@ -206,10 +205,10 @@ namespace booking_room
         }
         // DELETE : Universities(5)
 
-        public static int DeleteUniversityById(Universities university)
+        public int DeleteUniversityById(Universities university)
         {
             int result = 0;
-            using var connection = new SqlConnection(connectionString);
+            using var connection = MyConnection.Get();
 
             connection.Open();
             SqlTransaction transaction = connection.BeginTransaction();

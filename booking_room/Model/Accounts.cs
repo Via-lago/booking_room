@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace booking_room
+namespace booking_room.Model
 {
     public class Accounts
     {
@@ -12,7 +12,7 @@ namespace booking_room
         public string Password { get; set; }
         public string IsDelete { get; set; }
         public string OTP { get; set; }
-        public bool IsUsed { get; set; }    
+        public bool IsUsed { get; set; }
         public DateTime ExpiredTime { get; set; }
     }
 }
